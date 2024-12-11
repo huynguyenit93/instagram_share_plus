@@ -1,6 +1,6 @@
 import Flutter
 import UIKit
-//import Photos
+import Photos
 
 import PhotosUI
 
@@ -21,16 +21,44 @@ public class SwiftShareInstagramVideoPlugin:  UIViewController, FlutterPlugin,PH
     }
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        //        let url = call.arguments as! String
         guard call.method == "shareVideoToInstagram"
         else {
             result(FlutterMethodNotImplemented)
             return
             
         }
-        DispatchQueue.main.async {
+        if let args = call.arguments as? [String: Any], let path = args["path"] as? String, let type = args["type"] as? String {
+            print("Path: \(path), Type: \(type)")
             
-            return self.shareVideoToInstagram(result: result)
+            PHPhotoLibrary.requestAuthorization { status in
+                guard status == .authorized else {
+                    print("Permission denied to access Photos Library.")
+                    return result(String("error: Permission denied to access Photos Library"))
+                }
+                
+                var localIdentifier: String?
+                
+                // Save the image to the Photos Library
+                PHPhotoLibrary.shared().performChanges({
+                    let assetRequest = PHAssetChangeRequest.creationRequestForAssetFromImage(atFileURL: URL(string: path)!)
+                    localIdentifier = assetRequest?.placeholderForCreatedAsset?.localIdentifier
+                }) { success, error in
+                    if success {
+                        print("Image saved successfully. Local Identifier: \(localIdentifier ?? "unknown")")
+                        DispatchQueue.main.async {
+                            let url = URL(string: "instagram://library?LocalIdentifier=\(localIdentifier ?? "unknown")")
+                            guard UIApplication.shared.canOpenURL(url!) else {
+                                return
+                            }
+                            UIApplication.shared.open(url!, options: [:], completionHandler: nil)
+                        }
+                        return result(String("success"))
+                    } else if let error = error {
+                        print("Error saving image: \(error.localizedDescription)")
+                        return result(String("error: Error saving image: \(error.localizedDescription)"))
+                    }
+                }
+            }
         }
     }
     
