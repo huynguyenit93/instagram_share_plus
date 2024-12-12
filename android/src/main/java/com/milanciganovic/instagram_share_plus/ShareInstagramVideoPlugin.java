@@ -118,22 +118,18 @@ public class ShareInstagramVideoPlugin implements FlutterPlugin, MethodCallHandl
     File f = new File(path);
     Uri uri = ShareUtils.getUriForFile(mContext, f);
 
-    if (instagramInstalled()) {
-      StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
-      StrictMode.setVmPolicy(builder.build());
-      Intent shareIntent = new Intent();
-      shareIntent.setAction(Intent.ACTION_SEND);
-      shareIntent.setPackage(INSTAGRAM_PACKAGE_NAME);
-      shareIntent.putExtra(Intent.EXTRA_STREAM, "TEST");
-      shareIntent.setType(mediaType);
-      shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
-      shareIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-      try {
-        mContext.startActivity(shareIntent);
-      } catch (ActivityNotFoundException ex) {
-        openInstagramInPlayStore();
-      }
-    } else {
+    StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+    StrictMode.setVmPolicy(builder.build());
+    Intent shareIntent = new Intent();
+    shareIntent.setAction(Intent.ACTION_SEND);
+    shareIntent.setPackage(INSTAGRAM_PACKAGE_NAME);
+    shareIntent.putExtra(Intent.EXTRA_STREAM, "TEST");
+    shareIntent.setType(mediaType);
+    shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+    shareIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+    try {
+      mContext.startActivity(shareIntent);
+    } catch (ActivityNotFoundException ex) {
       openInstagramInPlayStore();
     }
   }
