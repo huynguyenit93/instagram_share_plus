@@ -33,7 +33,7 @@ public class SwiftShareInstagramVideoPlugin:  UIViewController, FlutterPlugin,PH
             PHPhotoLibrary.requestAuthorization { status in
                 guard status == .authorized else {
                     print("Permission denied to access Photos Library.")
-                    return result(String("error: Permission denied to access Photos Library"))
+                    return result(String("Permission denied to access Photos Library"))
                 }
                 
                 var localIdentifier: String?
@@ -48,14 +48,20 @@ public class SwiftShareInstagramVideoPlugin:  UIViewController, FlutterPlugin,PH
                         DispatchQueue.main.async {
                             let url = URL(string: "instagram://library?LocalIdentifier=\(localIdentifier ?? "unknown")")
                             guard UIApplication.shared.canOpenURL(url!) else {
-                                return
+                                return result(String("Instagram app not installed"))
                             }
-                            UIApplication.shared.open(url!, options: [:], completionHandler: nil)
+                            UIApplication.shared.open(url!, options: [:]) { success in
+                              if success {
+
+                              } else {
+                                    return result(String("Instagram app not installed"))
+                              }
+                            }
                         }
                         return result(String("success"))
                     } else if let error = error {
                         print("Error saving image: \(error.localizedDescription)")
-                        return result(String("error: Error saving image: \(error.localizedDescription)"))
+                        return result(String("Error saving image: \(error.localizedDescription)"))
                     }
                 }
             }
