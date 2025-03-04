@@ -58,7 +58,6 @@ public class SwiftShareInstagramVideoPlugin:  UIViewController, FlutterPlugin,PH
                               }
                             }
                         }
-                        return result(String("success"))
                     } else if let error = error {
                         print("Error saving image: \(error.localizedDescription)")
                         return result(String("Error saving image: \(error.localizedDescription)"))
