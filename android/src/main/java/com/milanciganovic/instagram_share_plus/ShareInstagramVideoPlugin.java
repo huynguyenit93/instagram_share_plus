@@ -25,7 +25,6 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry;
-import io.flutter.plugin.common.PluginRegistry.Registrar;
 
 /**
  * InstagramsharePlugin
@@ -42,13 +41,6 @@ public class ShareInstagramVideoPlugin implements FlutterPlugin, MethodCallHandl
 
   private Activity mActivity;
 
-  public static void registerWith(Registrar registrar) {
-    MethodChannel channel = new MethodChannel(registrar.messenger(), "instagram_share_plus");
-    final ShareInstagramVideoPlugin instance = new ShareInstagramVideoPlugin();
-//    registrar.addRequestPermissionsResultListener(instance);
-    channel.setMethodCallHandler(instance);
-  }
-
   @Override
   public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
     mContext = flutterPluginBinding.getApplicationContext();
@@ -58,8 +50,10 @@ public class ShareInstagramVideoPlugin implements FlutterPlugin, MethodCallHandl
 
   @Override
   public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
-    mChannel.setMethodCallHandler(null);
-    mChannel = null;
+    if (mChannel != null) {
+      mChannel.setMethodCallHandler(null);
+      mChannel = null;
+    }
   }
 
   @Override
